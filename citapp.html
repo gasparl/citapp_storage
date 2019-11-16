@@ -66,11 +66,28 @@
             .then(function(response) {
                 return response.text();
             })
-            .then(function(echoed) {
-                console.log(echoed);
+            .then(function(response) {
+                var feed;
+                if (response.slice(0,7) == 'victory') {
+                    document.getElementById("feedback_id").style.color = 'green';
+                    response = response.slice(7)
+                    if (response.slice(0,6) == 'insert') {
+                        response = response.slice(6)
+                        feed = "Data saved:<br>" + response.replace(/","/g, ", ");
+                    } else if (response.slice(0,6) == 'update') {
+                        response = response.slice(6)
+                        feed = "Data updated. Saved:<br>" + response.replace(/","/g, ", ");
+                    }
+                } else {
+                    document.getElementById("feedback_id").style.color = 'red';
+                    feed = 'Error. ' + response;
+                }
+                document.getElementById("feedback_id").innerHTML = feed + "<br>";
             })
             .catch(function(error) {
-                console.log('Request failed', error);
+                console.log('Request failed: ', error);
+                document.getElementById("feedback_id").style.color = 'red';
+                feed = 'Error. ' + response;
             });
     }
     </script>
@@ -203,7 +220,7 @@
             <input type="text" id="email_id" class="form_start" maxlength="300" size="30">
             <br><br><i>Password</i>:
             <input type="text" id="pass_id" class="form_start" maxlength="100" size="30">
-            <br><br><span id="feedback_id"></span><br>
+            <br><div style="padding:2vw;padding-left:7vw;padding-right:7vw;"><span id="feedback_id" style="overflow-wrap:break-word;"></span></div>
             <button onclick="store_stuff()">SUBMIT</button>
 
         </div>
