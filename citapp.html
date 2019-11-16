@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="icon" type="image/png" href="lg_logo.png">
+    <title>CITapp store settings</title>
+    <meta charset="UTF-8">
+    <script>
+        //only allow number in input field
+    function valid_nums(evt) {
+        var theEvent = evt || window.event;
+        var key = theEvent.keyCode || theEvent.which;
+        key = String.fromCharCode(key);
+        var regex = /[0-9]/;
+        if (!regex.test(key)) {
+            theEvent.returnValue = false;
+            if (theEvent.preventDefault) theEvent.preventDefault();
+        }
+    }
+    function valid_chars(evt) {
+        var theEvent = evt || window.event;
+        var key = theEvent.keyCode || theEvent.which;
+        key = String.fromCharCode(key);
+        var regex = /[a-zA-Z0-9_]/;
+        if (!regex.test(key)) {
+            theEvent.returnValue = false;
+            if (theEvent.preventDefault) theEvent.preventDefault();
+        }
+    }
+    // TODO replace JQuery
+    function store_stuff() {
+        console.log('store_stuff');
+        var all_stuff = {
+            'subject_id': document.getElementById("subj_id").value,
+            'cit_type': document.querySelector("input[name=cit_version]:checked").value,
+            'num_of_blocks': document.querySelector("input[name=num_of_blcks]:checked").value,
+            'deadline': document.getElementById("deadline_id").value,
+            'isi_min': document.getElementById("isi_min_id").value,
+            'isi_max': document.getElementById("isi_max_id").value,
+            'probe1': document.getElementById("probe1").value,
+            'probe2': document.getElementById("probe2").value,
+            'probe3': document.getElementById("probe3").value,
+            'probe4': document.getElementById("probe4").value,
+            'probe5': document.getElementById("probe5").value,
+            'filler1': document.getElementById("filler1").value,
+            'filler2': document.getElementById("filler2").value,
+            'filler3': document.getElementById("filler3").value,
+            'filler4': document.getElementById("filler4").value,
+            'filler5': document.getElementById("filler5").value,
+            'filler6': document.getElementById("filler6").value,
+            'filler7': document.getElementById("filler7").value,
+            'filler8': document.getElementById("filler8").value,
+            'filler9': document.getElementById("filler9").value
+        };
+        fetch('https://homepage.univie.ac.at/gaspar.lukacs/x_citapp/x_citapp_storage.php', {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email_post: document.getElementById("email_id").value,
+                    pw_post: document.getElementById("pass_id").value,
+                    data_post: JSON.stringify(all_stuff)
+                })
+            })
+            .then(function(response) {
+                return response.text();
+            })
+            .then(function(echoed) {
+                console.log(echoed);
+            })
+            .catch(function(error) {
+                console.log('Request failed', error);
+            });
+    }
+    </script>
+    <style>
+        html {
+            background: #DDDDDD;
+            font-size: 120%;
+        }
+        button {
+            -moz-box-shadow: inset 0vw 0.1vw 0vw 0vw #B0B0B0;
+            -webkit-box-shadow: inset 0vw 0.1vw 0vw 0vw #B0B0B0;
+            box-shadow: inset 0vw 0.1vw 0vw 0vw #B0B0B0;
+            background-color: #a6a6a6;
+            border-radius: 0.1vw;
+            border: 1px solid #dcdcdc;
+            cursor: pointer;
+            color: #000000;
+            font-size: 140%;
+            font-family: Helvetica;
+            font-weight: bold;
+            padding: 0.6vw 2.4vw;
+            text-decoration: none;
+            text-shadow: 0vw 0.1vw 0vw #C0C0C0;
+            outline-color: black;
+
+        }
+        button:hover {
+            background-color: #8c8c8c;
+        }
+        .cols {
+            display: block;
+            float:left;
+            padding: 2vw;
+            padding-bottom: 1vw;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div>
+        <div style="padding:2vw;text-align: center;padding-bottom: 0vw;">
+            All fields are optional. Fields submitted empty will return default values in the app.
+            <br><br>If email address is given as <i>Identifer</i>, password reminders can be requested in the app.
+        </div>
+        <div style="justify-content: center;align-items: center;display: flex;">
+            <div class="cols">
+
+                Subject ID:
+                <input type="text" onkeypress='valid_chars(event)' id="subj_id" class="form_start" maxlength="30" size="15">
+                <br><br> CIT version:
+                <input type="radio" id="enhanced_id" name="cit_version" checked="checked" value="0"><label for="enhanced_id">enhanced</label>
+                <input type="radio" id="standard_id" name="cit_version" value="1"><label for="standard_id">standard</label>
+                <input type="radio" id="notarget_id" name="cit_version" value="2"><label for="notarget_id">no-target</label>
+
+                <br><br> Number of blocks:
+                <input type="radio" id="1block" name="num_of_blcks" checked="checked" value="1"><label for="1block">1</label>
+                <input type="radio" id="2block" name="num_of_blcks" value="2"><label for="2block">2</label>
+                <input type="radio" id="3block" name="num_of_blcks" value="3">
+                <label for="3block">3</label>
+                <input type="radio" id="4block" name="num_of_blcks" value="4">
+                <label for="4block">4</label>
+                <br><br>
+                Response deadline (ms):
+                <input type="text" onkeypress='valid_nums(event)' id="deadline_id" class="form_start" maxlength="5" size="4">
+                <br><br>
+                Intertrial interval min.-max. (ms):
+                <input type="text" onkeypress='valid_nums(event)' id="isi_min_id" class="form_start" maxlength="5" size="4">
+                <input type="text" onkeypress='valid_nums(event)' id="isi_max_id" class="form_start" maxlength="5" size="4">
+
+                <br>
+                <br>Target:
+                <input type="text" id="target" class="form_start" maxlength="30" size="15">
+                <br>
+                <br>Probe 1:
+                <input type="text" id="probe1" class="form_start" maxlength="30" size="15">
+                <br>
+                <br>Probe 2:
+                <input type="text" id="probe2" class="form_start" maxlength="30" size="15">
+                <br>
+                <br>Probe 3:
+                <input type="text" id="probe3" class="form_start" maxlength="30" size="15">
+                <br>
+                <br>Probe 4:
+                <input type="text" id="probe4" class="form_start" maxlength="30" size="15">
+                <br>
+                <br>Probe 5:
+                <input type="text" id="probe5" class="form_start" maxlength="30" size="15">
+                <br>
+                <br>
+
+            </div>
+
+            <div class="cols">
+                <span style="line-height: 2.2;">
+                    Target filler 1:
+                    <input type="text" id="filler1" class="form_start" maxlength="30" size="15" value=''>
+
+                    <br>Target filler 2:
+                    <input type="text" id="filler2" class="form_start" maxlength="30" size="15" value=''>
+
+                    <br>Target filler 3:
+                    <input type="text" id="filler3" class="form_start" maxlength="30" size="15" value=''>
+
+                    <br>Nontarget filler 1:
+                    <input type="text" id="filler4" class="form_start" maxlength="30" size="15" value=''>
+
+                    <br>Nontarget filler 2:
+                    <input type="text" id="filler5" class="form_start" maxlength="30" size="15" value=''>
+
+                    <br>Nontarget filler 3:
+                    <input type="text" id="filler6" class="form_start" maxlength="30" size="15" value=''>
+
+                    <br>Nontarget filler 4:
+                    <input type="text" id="filler7" class="form_start" maxlength="30" size="15" value=''>
+
+                    <br>Nontarget filler 5:
+                    <input type="text" id="filler8" class="form_start" maxlength="30" size="15" value=''>
+
+                    <br>Nontarget filler 6:
+                    <input type="text" id="filler9" class="form_start" maxlength="30" size="15" value=''>
+                </span>
+
+            </div>
+
+        </div>
+
+        <div style="clear:both;text-align:center;">
+            <i>Identifier</i>:
+            <input type="text" id="email_id" class="form_start" maxlength="300" size="30">
+            <br><br><i>Password</i>:
+            <input type="text" id="pass_id" class="form_start" maxlength="100" size="30">
+            <br><br><span id="feedback_id"></span><br>
+            <button onclick="store_stuff()">SUBMIT</button>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
