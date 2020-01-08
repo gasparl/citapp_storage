@@ -27,16 +27,31 @@
             if (theEvent.preventDefault) theEvent.preventDefault();
         }
     }
-    // TODO replace JQuery
+    function valid_chars2(evt) {
+        var theEvent = evt || window.event;
+        var key = theEvent.keyCode || theEvent.which;
+        key = String.fromCharCode(key);
+        var regex = /[a-zA-Z0-9_@.!]/;
+        if (!regex.test(key)) {
+            theEvent.returnValue = false;
+            if (theEvent.preventDefault) theEvent.preventDefault();
+        }
+    }
     function store_stuff() {
-        console.log('store_stuff');
+        var e = document.getElementById("lang");
+        var checkboxes = document.querySelectorAll("input[name=consents]");
+        var checkedboxs = [];
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) { checkedboxs.push(checkboxes[i].value); }
+        }
         var all_stuff = {
             'subject_id': document.getElementById("subj_id").value,
-            'cit_type': document.querySelector("input[name=cit_version]:checked").value,
+            'cit_version': document.querySelector("input[name=cit_version]:checked").value,
             'num_of_blocks': document.querySelector("input[name=num_of_blcks]:checked").value,
-            'deadline': document.getElementById("deadline_id").value,
+            'timelimit': document.getElementById("deadline_id").value,
             'isi_min': document.getElementById("isi_min_id").value,
             'isi_max': document.getElementById("isi_max_id").value,
+            'target': document.getElementById("target").value,
             'probe1': document.getElementById("probe1").value,
             'probe2': document.getElementById("probe2").value,
             'probe3': document.getElementById("probe3").value,
@@ -50,7 +65,10 @@
             'filler6': document.getElementById("filler6").value,
             'filler7': document.getElementById("filler7").value,
             'filler8': document.getElementById("filler8").value,
-            'filler9': document.getElementById("filler9").value
+            'filler9': document.getElementById("filler9").value,
+            'consent': checkedboxs,
+            'language': e.options[e.selectedIndex].value,
+            'mails': document.getElementById("mails").value
         };
         fetch('https://homepage.univie.ac.at/gaspar.lukacs/x_citapp/x_citapp_storage.php', {
                 method: 'post',
@@ -87,7 +105,8 @@
             .catch(function(error) {
                 console.log('Request failed: ', error);
                 document.getElementById("feedback_id").style.color = 'red';
-                feed = 'Error. ' + response;
+                var feed = 'Could not connect to server. ' + error;
+                document.getElementById("feedback_id").innerHTML = feed + "<br>";
             });
     }
     </script>
@@ -130,35 +149,41 @@
 <body>
     <div>
         <div style="padding:2vw;text-align: center;padding-bottom: 0vw;">
-            All fields are optional. Fields submitted empty will return default values in the app.
-            <br><br>If email address is given as <i>Identifer</i>, password reminders can be requested in the app.
+            Fields submitted empty will not change the respective values in the app.
+            <br><br>If email address is given as <i>Identifier</i>, password reminders can be requested in the app.
         </div>
-        <div style="justify-content: center;align-items: center;display: flex;">
+        <div style="justify-content: center;align-items: center;display: flex;font-weight:bold;">
             <div class="cols">
 
                 Subject ID:
                 <input type="text" onkeypress='valid_chars(event)' id="subj_id" class="form_start" maxlength="30" size="15">
+
                 <br><br> CIT version:
-                <input type="radio" id="enhanced_id" name="cit_version" checked="checked" value="0"><label for="enhanced_id">enhanced</label>
-                <input type="radio" id="standard_id" name="cit_version" value="1"><label for="standard_id">standard</label>
-                <input type="radio" id="notarget_id" name="cit_version" value="2"><label for="notarget_id">no-target</label>
+                <span style="font-weight:normal;">
+                    <input type="radio" id="enhanced_id" name="cit_version" checked="checked" value="0"><label for="enhanced_id">enhanced</label>
+                    <input type="radio" id="standard_id" name="cit_version" value="1"><label for="standard_id">standard</label>
+                    <input type="radio" id="notarget_id" name="cit_version" value="2"><label for="notarget_id">no-target</label>
+                </span>
 
                 <br><br> Number of blocks:
-                <input type="radio" id="1block" name="num_of_blcks" checked="checked" value="1"><label for="1block">1</label>
-                <input type="radio" id="2block" name="num_of_blcks" value="2"><label for="2block">2</label>
-                <input type="radio" id="3block" name="num_of_blcks" value="3">
-                <label for="3block">3</label>
-                <input type="radio" id="4block" name="num_of_blcks" value="4">
-                <label for="4block">4</label>
+                <span style="font-weight:normal;">
+                    <input type="radio" id="1block" name="num_of_blcks" checked="checked" value="1"><label for="1block">1</label>
+                    <input type="radio" id="2block" name="num_of_blcks" value="2"><label for="2block">2</label>
+                    <input type="radio" id="3block" name="num_of_blcks" value="3">
+                    <label for="3block">3</label>
+                    <input type="radio" id="4block" name="num_of_blcks" value="4">
+                    <label for="4block">4</label>
+                </span>
                 <br><br>
-                Response deadline (ms):
+                Response time limit (ms):
                 <input type="text" onkeypress='valid_nums(event)' id="deadline_id" class="form_start" maxlength="5" size="4">
                 <br><br>
-                Intertrial interval min.-max. (ms):
+                Interstimulus interval min.-max. (ms):
                 <input type="text" onkeypress='valid_nums(event)' id="isi_min_id" class="form_start" maxlength="5" size="4">
                 <input type="text" onkeypress='valid_nums(event)' id="isi_max_id" class="form_start" maxlength="5" size="4">
 
-                <br>
+                <hr>
+
                 <br>Target:
                 <input type="text" id="target" class="form_start" maxlength="30" size="15">
                 <br>
@@ -183,6 +208,30 @@
 
             <div class="cols">
                 <span style="line-height: 2.2;">
+
+                    <br>Instruction language:
+                    <span style="font-weight:normal;">
+                        <select id='lang'>
+                            <option value="en">English (EN)</option>
+                            <option value="de">Deutsch (DE)</option>
+                            <option value="hu">Magyar (HU)</option>
+                            <option value="jp">日本語 (JP)</option>
+                            <option value="pl">Polski (PL)</option>
+                        </select>
+                    </span>
+
+                    <br>Data sharing consent choices:
+                    <span style="font-weight:normal;">
+                        <input type="checkbox" id="no" name="consents" value="0"><label for="no">No</label>
+                        <input type="checkbox" id="yes" name="consents" value="1"><label for="yes">Yes</label>
+                        <input type="checkbox" id="partyes" name="consents" value="2"><label for="partyes">Yes but without items</label>
+                    </span>
+
+                    <br>Default email(s):
+                    <input type="text" id="mails" class="form_start" maxlength="50" size="15" value=''>
+
+                    <hr>
+
                     Target filler 1:
                     <input type="text" id="filler1" class="form_start" maxlength="30" size="15" value=''>
 
@@ -215,12 +264,14 @@
 
         </div>
 
-        <div style="clear:both;text-align:center;">
+
+        <div style="clear:both;text-align:center;font-weight:bold;">
             <i>Identifier</i>:
-            <input type="text" id="email_id" class="form_start" maxlength="300" size="30">
+            <input type="text" onkeypress='valid_chars2(event)' id="email_id" class="form_start" maxlength="300" size="30">
             <br><br><i>Password</i>:
-            <input type="text" id="pass_id" class="form_start" maxlength="100" size="30">
-            <br><div style="padding:2vw;padding-left:7vw;padding-right:7vw;"><span id="feedback_id" style="overflow-wrap:break-word;"></span></div>
+            <input type="text" onkeypress='valid_chars(event)' id="pass_id" class="form_start" maxlength="100" size="30">
+            <br>
+            <div style="padding:2vw;padding-left:7vw;padding-right:7vw;"><span id="feedback_id" style="overflow-wrap:break-word;"></span></div>
             <button onclick="store_stuff()">SUBMIT</button>
 
         </div>
